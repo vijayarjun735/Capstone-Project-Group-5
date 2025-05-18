@@ -9,6 +9,7 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 ## Group Members
 
 1. Arjun Vijayakumar
+2. Jaison Abraham
 
 ## Features
 
@@ -16,6 +17,12 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 * User can **View** fridge items.
 * User can **colour-code items** (_red - expired, orange - expiring soon, green - fresh_).
 * User can switch to **dark mode**.
+
+* Users can **Update** items
+* Users can **Delete** items
+* Users can **Change the Theme color**
+* Users can **tag or categorize** items
+
 
 
 
