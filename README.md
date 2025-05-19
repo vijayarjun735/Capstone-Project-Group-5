@@ -10,6 +10,7 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 
 1. Arjun Vijayakumar
 2. Jaison Abraham
+3. Vimalnath Krishnamoorthy
 
 ## Features
 
@@ -23,8 +24,10 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 * Users can **Change the Theme color**
 * Users can **tag or categorize** items
 
-
-
+* Animated **Splash Screen**
+* Users can see their **history** of added or removed items
+* Users can mark **favorites** (*e.g., often-used items*)
+* Users can **delete all data**
 
 ## Data Sources
 
