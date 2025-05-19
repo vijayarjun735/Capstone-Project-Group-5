@@ -11,6 +11,7 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 1. Arjun Vijayakumar
 2. Jaison Abraham
 3. Vimalnath Krishnamoorthy
+4. Stalin Joy
 
 ## Features
 
@@ -28,6 +29,12 @@ ChillCheck helps you keep track of what's in your fridge and reminds you before 
 * Users can see their **history** of added or removed items
 * Users can mark **favorites** (*e.g., often-used items*)
 * Users can **delete all data**
+
+* User can **Search** items by name
+* User can **Filer** items by expiry date
+* User recieves **Reminders** for items nearing expiry
+* Shake device to **Suggest Items** to use that day  
+
 
 ## Data Sources
 
