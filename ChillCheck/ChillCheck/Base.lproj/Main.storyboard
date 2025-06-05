@@ -1,24 +1,266 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Nav-Root">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
-        <scene sceneID="tne-QT-ifu">
+        <!--Navigation Controller-->
+        <scene sceneID="Nav-Scene">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Nav-Root" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Nav-Bar">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Fridge-VC" kind="relationship" relationship="rootViewController" id="Nav-To-Main"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Nav-Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="103.05343511450382" y="-27.464788732394368"/>
+        </scene>
+        <!--Fridge View Controller-->
+        <scene sceneID="Main-Scene">
+            <objects>
+                <viewController id="Fridge-VC" customClass="FridgeViewController" customModule="FridgeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Main-View">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Main-TableView">
+                                <rect key="frame" x="0.0" y="103" width="393" height="749"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="FridgeItemCell" textLabel="Cell-Title" detailTextLabel="Cell-Subtitle" style="IBUITableViewCellStyleSubtitle" id="Table-Cell">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Table-Cell" id="Cell-Content">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Cell-Title">
+                                                    <rect key="frame" x="20" y="6.0000000000000009" width="25" height="14.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Cell-Subtitle">
+                                                    <rect key="frame" x="19.999999999999996" y="22.333333333333336" width="40.333333333333336" height="13.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Main-SafeArea"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Main-TableView" firstAttribute="top" secondItem="Main-SafeArea" secondAttribute="top" id="Table-Top"/>
+                            <constraint firstItem="Main-TableView" firstAttribute="leading" secondItem="Main-SafeArea" secondAttribute="leading" id="Table-Leading"/>
+                            <constraint firstItem="Main-SafeArea" firstAttribute="bottom" secondItem="Main-TableView" secondAttribute="bottom" constant="34" id="Table-Bottom"/>
+                            <constraint firstItem="Main-SafeArea" firstAttribute="trailing" secondItem="Main-TableView" secondAttribute="trailing" id="Table-Trailing"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Main-NavItem">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Add-Button">
+                            <connections>
+                                <action selector="addButtonTapped:" destination="Fridge-VC" id="Add-Action"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="addButton" destination="Add-Button" id="Add-Outlet"/>
+                        <outlet property="tableView" destination="Main-TableView" id="Table-Outlet"/>
+                        <segue destination="Modal-Nav" kind="presentation" identifier="showAddItem" id="Add-Segue"/>
+                        <segue destination="Modal-Nav" kind="presentation" identifier="showEditItem" id="Edit-Segue"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Main-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1031.2977099236641" y="-27.464788732394368"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Modal-Nav-Scene">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Modal-Nav" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Modal-NavBar">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="AddEdit-VC" kind="relationship" relationship="rootViewController" id="Modal-To-AddEdit"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Modal-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1959.5419847328244" y="-27.464788732394368"/>
+        </scene>
+        <!--Add Edit Item View Controller-->
+        <scene sceneID="AddEdit-Scene">
+            <objects>
+                <viewController id="AddEdit-VC" customClass="AddEditItemViewController" customModule="FridgeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="AddEdit-View">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Scroll-View">
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Content-View">
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="715"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Main-Stack">
+                                                <rect key="frame" x="20" y="30" width="353" height="655"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Item Name *" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Name-Label">
+                                                        <rect key="frame" x="0.0" y="0.0" width="353" height="20.333333333333332"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedTextColor"/>
+                                                    </label>
+                                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter item name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Name-TextField">
+                                                        <rect key="frame" x="0.0" y="40.333333333333343" width="353" height="34"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits" returnKeyType="next"/>
+                                                    </textField>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quantity *" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Quantity-Label">
+                                                        <rect key="frame" x="0.0" y="94.333333333333343" width="353" height="20.333333333333329"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedTextColor"/>
+                                                    </label>
+                                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter quantity" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Quantity-TextField">
+                                                        <rect key="frame" x="0.0" y="134.66666666666666" width="353" height="34"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="next"/>
+                                                    </textField>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Category" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Category-Label">
+                                                        <rect key="frame" x="0.0" y="188.66666666666666" width="353" height="20.333333333333343"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedTextColor"/>
+                                                    </label>
+                                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="e.g., Dairy, Meat, Vegetables" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Category-TextField">
+                                                        <rect key="frame" x="0.0" y="229" width="353" height="34"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                    </textField>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Switch-Container">
+                                                        <rect key="frame" x="0.0" y="283" width="353" height="31"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Has Expiration Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Switch-Label">
+                                                                <rect key="frame" x="0.0" y="5.6666666666666679" width="149.33333333333334" height="20.333333333333329"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <nil key="textColor"/>
+                                                                <nil key="highlightedTextColor"/>
+                                                            </label>
+                                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Expiration-Switch">
+                                                                <rect key="frame" x="304" y="0.0" width="51" height="31"/>
+                                                                <connections>
+                                                                    <action selector="expirationSwitchChanged:" destination="AddEdit-VC" eventType="valueChanged" id="Switch-Action"/>
+                                                                </connections>
+                                                            </switch>
+                                                        </subviews>
+                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                        <constraints>
+                                                            <constraint firstItem="Switch-Label" firstAttribute="centerY" secondItem="Switch-Container" secondAttribute="centerY" id="Switch-Label-CenterY"/>
+                                                            <constraint firstItem="Switch-Label" firstAttribute="leading" secondItem="Switch-Container" secondAttribute="leading" id="Switch-Label-Leading"/>
+                                                            <constraint firstAttribute="trailing" secondItem="Expiration-Switch" secondAttribute="trailing" id="Switch-Trailing"/>
+                                                            <constraint firstItem="Expiration-Switch" firstAttribute="centerY" secondItem="Switch-Container" secondAttribute="centerY" id="Switch-CenterY"/>
+                                                        </constraints>
+                                                    </view>
+                                                    <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" style="wheels" translatesAutoresizingMaskIntoConstraints="NO" id="Date-Picker">
+                                                        <rect key="frame" x="0.0" y="334" width="353" height="216"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="216" id="DatePicker-Height"/>
+                                                        </constraints>
+                                                    </datePicker>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Spacer-View">
+                                                        <rect key="frame" x="0.0" y="570" width="353" height="85"/>
+                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="85" id="Spacer-Height"/>
+                                                        </constraints>
+                                                    </view>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="Main-Stack" secondAttribute="bottom" constant="30" id="Stack-Bottom"/>
+                                            <constraint firstItem="Main-Stack" firstAttribute="top" secondItem="Content-View" secondAttribute="top" constant="30" id="Stack-Top"/>
+                                            <constraint firstAttribute="trailing" secondItem="Main-Stack" secondAttribute="trailing" constant="20" id="Stack-Trailing"/>
+                                            <constraint firstItem="Main-Stack" firstAttribute="leading" secondItem="Content-View" secondAttribute="leading" constant="20" id="Stack-Leading"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Content-View" firstAttribute="width" secondItem="Scroll-View" secondAttribute="width" id="Content-Width"/>
+                                    <constraint firstAttribute="bottom" secondItem="Content-View" secondAttribute="bottom" id="Content-Bottom"/>
+                                    <constraint firstItem="Content-View" firstAttribute="top" secondItem="Scroll-View" secondAttribute="top" id="Content-Top"/>
+                                    <constraint firstAttribute="trailing" secondItem="Content-View" secondAttribute="trailing" id="Content-Trailing"/>
+                                    <constraint firstItem="Content-View" firstAttribute="leading" secondItem="Scroll-View" secondAttribute="leading" id="Content-Leading"/>
+                                    <constraint firstItem="Content-View" firstAttribute="height" secondItem="Scroll-View" secondAttribute="height" id="Content-Height"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="AddEdit-SafeArea"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="AddEdit-SafeArea" firstAttribute="bottom" secondItem="Scroll-View" secondAttribute="bottom" id="Scroll-Bottom"/>
+                            <constraint firstItem="Scroll-View" firstAttribute="top" secondItem="AddEdit-SafeArea" secondAttribute="top" id="Scroll-Top"/>
+                            <constraint firstItem="AddEdit-SafeArea" firstAttribute="trailing" secondItem="Scroll-View" secondAttribute="trailing" id="Scroll-Trailing"/>
+                            <constraint firstItem="Scroll-View" firstAttribute="leading" secondItem="AddEdit-SafeArea" secondAttribute="leading" id="Scroll-Leading"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="AddEdit-NavItem">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Cancel-Button">
+                            <connections>
+                                <action selector="cancelButtonTapped:" destination="AddEdit-VC" id="Cancel-Action"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="Save-Button">
+                            <connections>
+                                <action selector="saveButtonTapped:" destination="AddEdit-VC" id="Save-Action"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cancelButton" destination="Cancel-Button" id="Cancel-Outlet"/>
+                        <outlet property="categoryTextField" destination="Category-TextField" id="Category-Outlet"/>
+                        <outlet property="expirationDatePicker" destination="Date-Picker" id="DatePicker-Outlet"/>
+                        <outlet property="expirationSwitch" destination="Expiration-Switch" id="Switch-Outlet"/>
+                        <outlet property="nameTextField" destination="Name-TextField" id="Name-Outlet"/>
+                        <outlet property="quantityTextField" destination="Quantity-TextField" id="Quantity-Outlet"/>
+                        <outlet property="saveButton" destination="Save-Button" id="Save-Outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AddEdit-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2887.7862595419846" y="-27.464788732394368"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
