@@ -7,133 +7,81 @@
 
 import UIKit
 
-protocol AddEditItemDelegate: AnyObject {
-    func didAddItem(_ item: FridgeItem)
-    func didUpdateItem(_ item: FridgeItem, at index: Int)
-}
-
 class AddEditItemViewController: UIViewController {
-    
+
+    // MARK: – New properties for “Edit” mode
+    var existingItem: FridgeItem?
+    var itemIndex: Int?
+
+    // MARK: – IBOutlets (as you already have them)
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var quantityTextField: UITextField!
     @IBOutlet weak var categoryTextField: UITextField!
-    @IBOutlet weak var expirationDatePicker: UIDatePicker!
     @IBOutlet weak var expirationSwitch: UISwitch!
-    @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var expirationDatePicker: UIDatePicker!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
-    
-    weak var delegate: AddEditItemDelegate?
-    var itemToEdit: FridgeItem?
-    var editingIndex: Int?
-    
+    @IBOutlet weak var saveButton: UIBarButtonItem!
+
     override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        populateFields()
-    }
-    
-    private func setupUI() {
-        if itemToEdit != nil {
-            title = "Edit Item"
+        super.viewDidLoad() 
+        
+        // If we came in “Edit” mode, populate fields:
+        if let itemToEdit = existingItem {
+            nameTextField.text = itemToEdit.name
+            quantityTextField.text = "\(itemToEdit.quantity)"
+            categoryTextField.text = itemToEdit.category
+            
+            if let expDate = itemToEdit.expirationDate {
+                expirationSwitch.isOn = true
+                expirationDatePicker.date = expDate
+                expirationDatePicker.isHidden = false
+            } else {
+                expirationSwitch.isOn = false
+                expirationDatePicker.isHidden = true
+            }
         } else {
-            title = "Add Item"
-        }
-        
-        expirationDatePicker.datePickerMode = .date
-        expirationDatePicker.preferredDatePickerStyle = .wheels
-        expirationDatePicker.minimumDate = Date()
-        
-        // Initially hide date picker
-        expirationDatePicker.isHidden = !expirationSwitch.isOn
-        
-        nameTextField.delegate = self
-        quantityTextField.delegate = self
-        categoryTextField.delegate = self
-        
-        quantityTextField.keyboardType = .numberPad
-    }
-    
-    private func populateFields() {
-        guard let item = itemToEdit else { return }
-        
-        nameTextField.text = item.name
-        quantityTextField.text = "\(item.quantity)"
-        categoryTextField.text = item.category
-        
-        if let expirationDate = item.expirationDate {
-            expirationSwitch.isOn = true
-            expirationDatePicker.date = expirationDate
-            expirationDatePicker.isHidden = false
-        } else {
+            // “Add” mode: hide the date picker until switch is on
             expirationSwitch.isOn = false
             expirationDatePicker.isHidden = true
         }
     }
-    
+
+    // MARK: – IBActions
+
     @IBAction func expirationSwitchChanged(_ sender: UISwitch) {
         expirationDatePicker.isHidden = !sender.isOn
-        
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
-        }
     }
-    
+
+    @IBAction func cancelButtonTapped(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
+
     @IBAction func saveButtonTapped(_ sender: UIBarButtonItem) {
-        guard let name = nameTextField.text, !name.isEmpty,
-              let quantityText = quantityTextField.text, !quantityText.isEmpty,
-              let quantity = Int(quantityText) else {
-            showAlert(message: "Please fill in all required fields")
+        // Validate name and quantity
+        guard
+            let name = nameTextField.text, !name.isEmpty,
+            let qtyText = quantityTextField.text, let quantity = Int(qtyText)
+        else {
+            // You might want to show an “alert” here if fields are invalid
             return
         }
-        
-        let category = categoryTextField.text?.isEmpty == false ? categoryTextField.text! : "Other"
+
+        // Build a FridgeItem from the form
+        let category = categoryTextField.text ?? "Other"
         let expirationDate = expirationSwitch.isOn ? expirationDatePicker.date : nil
-        
-        if let editingIndex = editingIndex {
-            // Update existing item
-            var updatedItem = itemToEdit!
-            updatedItem.name = name
-            updatedItem.quantity = quantity
-            updatedItem.category = category
-            updatedItem.expirationDate = expirationDate
-            
-            delegate?.didUpdateItem(updatedItem, at: editingIndex)
+        let newItem = FridgeItem(name: name, quantity: quantity, expirationDate: expirationDate, category: category)
+
+        // Load the current list, update or append, then save
+        var allItems = FridgeDataManager.shared.loadFridgeItems()
+        if let index = itemIndex {
+            // We came from “Edit” – replace the old item
+            allItems[index] = newItem
         } else {
-            // Add new item
-            let newItem = FridgeItem(
-                name: name,
-                quantity: quantity,
-                expirationDate: expirationDate,
-                category: category
-            )
-            delegate?.didAddItem(newItem)
+            // We came from “Add” – append
+            allItems.append(newItem)
         }
-        
-        dismiss(animated: true)
-    }
-    
-    @IBAction func cancelButtonTapped(_ sender: UIBarButtonItem) {
-        dismiss(animated: true)
-    }
-    
-    private func showAlert(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+
+        FridgeDataManager.shared.saveFridgeItems(allItems)
+        dismiss(animated: true, completion: nil)
     }
 }
-
-// MARK: - UITextFieldDelegate
-extension AddEditItemViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == nameTextField {
-            quantityTextField.becomeFirstResponder()
-        } else if textField == quantityTextField {
-            categoryTextField.becomeFirstResponder()
-        } else {
-            textField.resignFirstResponder()
-        }
-        return true
-    }
-}
-

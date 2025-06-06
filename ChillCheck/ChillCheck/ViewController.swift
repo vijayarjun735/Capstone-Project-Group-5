@@ -7,7 +7,7 @@
 
 import UIKit
 
-class FridgeViewController: UIViewController {
+class FridgeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIBarButtonItem!
@@ -31,6 +31,9 @@ class FridgeViewController: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        // If you registered a plain UITableViewCell in code, keep this.
+        // Otherwise, make sure your storyboard cell has the Identifier "FridgeItemCell"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FridgeItemCell")
     }
     
@@ -47,76 +50,71 @@ class FridgeViewController: UIViewController {
         performSegue(withIdentifier: "showAddItem", sender: nil)
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showAddItem" {
-            if let navController = segue.destination as? UINavigationController,
-               let addItemVC = navController.topViewController as? AddEditItemViewController {
-                addItemVC.delegate = self
-            }
-        } else if segue.identifier == "showEditItem" {
-            if let navController = segue.destination as? UINavigationController,
-               let editItemVC = navController.topViewController as? AddEditItemViewController,
-               let indexPath = sender as? IndexPath {
-                editItemVC.delegate = self
-                editItemVC.itemToEdit = fridgeItems[indexPath.row]
-                editItemVC.editingIndex = indexPath.row
-            }
-        }
-    }
-}
-
-// MARK: - TableView DataSource and Delegate
-extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
+    // MARK: - UITableViewDataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return fridgeItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Dequeue a cell with the same identifier you set in the storyboard ("FridgeItemCell")
         let cell = tableView.dequeueReusableCell(withIdentifier: "FridgeItemCell", for: indexPath)
         let item = fridgeItems[indexPath.row]
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        
-        var subtitle = "Quantity: \(item.quantity)"
-        if let expirationDate = item.expirationDate {
-            subtitle += " • Expires: \(dateFormatter.string(from: expirationDate))"
-        }
-        
+        // Configure text labels (you can adjust formatting as desired)
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = subtitle
-        cell.accessoryType = .disclosureIndicator
+        let qtyString = "Qty: \(item.quantity)"
+        
+        if let exp = item.expirationDate {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            let dateString = formatter.string(from: exp)
+            cell.detailTextLabel?.text = "\(qtyString)  •  Exp: \(dateString)"
+        } else {
+            cell.detailTextLabel?.text = qtyString
+        }
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        performSegue(withIdentifier: "showEditItem", sender: indexPath)
+    // Enable swipe-to-delete
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
+                   forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            // 1. Remove from data source
+            fridgeItems.remove(at: indexPath.row)
+            // 2. Persist the updated array
+            saveFridgeItems()
+            // 3. Animate deletion in the table view
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            fridgeItems.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            saveFridgeItems()
+    // (Optional) If you want to show a “Delete” button instead of the default,
+    // implement this and return a custom title/styles:
+    /*
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Remove"
+    }
+    */
+    
+    // MARK: - UITableViewDelegate
+    
+    // (If you want to allow tapping a row to edit, etc.; otherwise these can be empty)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Example: perform edit segue
+        let selectedItem = fridgeItems[indexPath.row]
+        performSegue(withIdentifier: "showEditItem", sender: selectedItem)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    // Prepare for segue to Add/Edit screen if you need to pass the tapped item
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showEditItem",
+           let nav = segue.destination as? UINavigationController,
+           let editVC = nav.topViewController as? AddEditItemViewController,
+           let itemToEdit = sender as? FridgeItem {
+            editVC.existingItem = itemToEdit
         }
     }
 }
-
-// MARK: - AddEditItemDelegate
-extension FridgeViewController: AddEditItemDelegate {
-    func didAddItem(_ item: FridgeItem) {
-        fridgeItems.append(item)
-        saveFridgeItems()
-        tableView.reloadData()
-    }
-    
-    func didUpdateItem(_ item: FridgeItem, at index: Int) {
-        fridgeItems[index] = item
-        saveFridgeItems()
-        tableView.reloadData()
-    }
-}
-
