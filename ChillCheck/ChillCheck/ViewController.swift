@@ -32,7 +32,15 @@ class FridgeViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FridgeItemCell")
+
+        searchBar.delegate = self
+        searchBar.placeholder = "Search fridge items..."
+        searchBar.showsCancelButton = false
+
+        setupMenuButton()
+
     }
+    
     
     private func loadFridgeItems() {
         fridgeItems = FridgeDataManager.shared.loadFridgeItems()
@@ -65,6 +73,39 @@ class FridgeViewController: UIViewController {
     }
 }
 
+extension FridgeViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            isSearching = false
+            filteredFridgeItems = fridgeItems
+        } else {
+            isSearching = true
+            filteredFridgeItems = fridgeItems.filter { item in
+                item.name.lowercased().contains(searchText.lowercased()) ||
+                item.category.lowercased().contains(searchText.lowercased())
+            }
+        }
+        tableView.reloadData()
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.showsCancelButton = false
+        searchBar.resignFirstResponder()
+        isSearching = false
+        filteredFridgeItems = fridgeItems
+        tableView.reloadData()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+}
+// ========== NEW CODE END: Search Bar Delegate ==========
 // MARK: - TableView DataSource and Delegate
 extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
     
