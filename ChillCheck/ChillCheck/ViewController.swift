@@ -11,18 +11,23 @@ class FridgeViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addButton: UIBarButtonItem!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var fridgeItems: [FridgeItem] = []
+    var filteredFridgeItems: [FridgeItem] = []
+    var isSearching = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         loadFridgeItems()
+        applyTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadFridgeItems()
+        applyTheme()
     }
     
     private func setupUI() {
@@ -105,7 +110,6 @@ extension FridgeViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
 }
-// ========== NEW CODE END: Search Bar Delegate ==========
 // MARK: - TableView DataSource and Delegate
 extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
     

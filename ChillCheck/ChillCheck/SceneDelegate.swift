@@ -16,6 +16,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be set and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        
+        applyTheme()
+ 
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -28,6 +31,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        
+        applyTheme()
+
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -38,6 +44,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        
+        applyTheme()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -45,6 +53,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
+    
+    private func applyTheme() {
+        let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
+        
+        if #available(iOS 13.0, *) {
+            window?.overrideUserInterfaceStyle = isDarkMode ? .dark : .light
+        }
+    }
 }
-
-
