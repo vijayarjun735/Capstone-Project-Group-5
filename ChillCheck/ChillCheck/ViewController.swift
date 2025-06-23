@@ -62,7 +62,7 @@ class FridgeViewController: UIViewController {
         )
         navigationItem.leftBarButtonItem = menuButton
     }
-        @objc private func menuButtonTapped() {
+    @objc private func menuButtonTapped() {
         performSegue(withIdentifier: "showMenu", sender: nil)
     }
     private func toggleDarkMode() {
@@ -70,17 +70,17 @@ class FridgeViewController: UIViewController {
         UserDefaults.standard.set(!currentMode, forKey: "isDarkMode")
         applyTheme()
     }
-    private func applyTheme() {
+        private func applyTheme() {
         let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         
         if #available(iOS 13.0, *) {
             view.window?.overrideUserInterfaceStyle = isDarkMode ? .dark : .light
         } else {
+            // Fallback for iOS 12 and earlier
             navigationController?.navigationBar.barStyle = isDarkMode ? .black : .default
             tableView.backgroundColor = isDarkMode ? .black : .white
         }
     }
-    
     private func confirmDeleteAllData() {
         let alertController = UIAlertController(
             title: "Delete All Data",
@@ -99,7 +99,6 @@ class FridgeViewController: UIViewController {
         
         present(alertController, animated: true)
     }
-    
     private func deleteAllData() {
         fridgeItems.removeAll()
         filteredFridgeItems.removeAll()
@@ -160,7 +159,20 @@ class FridgeViewController: UIViewController {
                let editItemVC = navController.topViewController as? AddEditItemViewController,
                let indexPath = sender as? IndexPath {
                 editItemVC.delegate = self
-
+                let itemsArray = isSearching ? filteredFridgeItems : fridgeItems
+                editItemVC.itemToEdit = itemsArray[indexPath.row]
+                if isSearching {
+                    editItemVC.editingIndex = fridgeItems.firstIndex { $0.id == itemsArray[indexPath.row].id }
+                } else {
+                    editItemVC.editingIndex = indexPath.row
+                }
+            }
+        } else if segue.identifier == "showMenu" {
+            if let navController = segue.destination as? UINavigationController,
+               let menuVC = navController.topViewController as? MenuViewController {
+                menuVC.delegate = self
+            }
+        }
     }
 }
 
@@ -206,7 +218,41 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
         return isSearching ? filteredFridgeItems.count : fridgeItems.count
     }
     
-    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FridgeItemCell", for: indexPath)
+        let item = isSearching ? filteredFridgeItems[indexPath.row] : fridgeItems[indexPath.row]
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        
+        var subtitle = "Quantity: \(item.quantity) • Category: \(item.category)"
+        if let expirationDate = item.expirationDate {
+            subtitle += " • Expires: \(dateFormatter.string(from: expirationDate))"
+        }
+        
+        cell.textLabel?.text = item.name
+        cell.detailTextLabel?.text = subtitle
+        cell.accessoryType = .disclosureIndicator
+        
+        let expirationColor = getExpirationColor(for: item)
+        cell.textLabel?.textColor = expirationColor
+        
+        // Add a colored indicator view
+        if item.expirationDate != nil {
+            let indicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 4, height: 44))
+            indicatorView.backgroundColor = expirationColor
+            cell.contentView.addSubview(indicatorView)
+            indicatorView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                indicatorView.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor),
+                indicatorView.topAnchor.constraint(equalTo: cell.contentView.topAnchor),
+                indicatorView.bottomAnchor.constraint(equalTo: cell.contentView.bottomAnchor),
+                indicatorView.widthAnchor.constraint(equalToConstant: 4)
+            ])
+        }
+        
+        return cell
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -273,4 +319,3 @@ extension FridgeViewController: MenuDelegate {
         confirmDeleteAllData()
     }
 }
-
