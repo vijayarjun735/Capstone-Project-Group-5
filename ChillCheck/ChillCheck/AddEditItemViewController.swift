@@ -21,6 +21,8 @@ class AddEditItemViewController: UIViewController {
     @IBOutlet weak var expirationSwitch: UISwitch!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
+    private var colorPreviewView: UIView!
+    private var colorPreviewLabel: UILabel!
     
     weak var delegate: AddEditItemDelegate?
     var itemToEdit: FridgeItem?
@@ -29,7 +31,14 @@ class AddEditItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupColorPreview()
         populateFields()
+        applyTheme()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        applyTheme()
     }
     
     private func setupUI() {
@@ -43,7 +52,6 @@ class AddEditItemViewController: UIViewController {
         expirationDatePicker.preferredDatePickerStyle = .wheels
         expirationDatePicker.minimumDate = Date()
         
-        // Initially hide date picker
         expirationDatePicker.isHidden = !expirationSwitch.isOn
         
         nameTextField.delegate = self
@@ -51,7 +59,94 @@ class AddEditItemViewController: UIViewController {
         categoryTextField.delegate = self
         
         quantityTextField.keyboardType = .numberPad
+        expirationDatePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
     }
+    
+    private func setupColorPreview() {
+        let containerView = UIView()
+        containerView.backgroundColor = UIColor.systemBackground
+        containerView.layer.cornerRadius = 8
+        containerView.layer.borderWidth = 1
+        containerView.layer.borderColor = UIColor.systemGray4.cgColor
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        colorPreviewView = UIView()
+        colorPreviewView.layer.cornerRadius = 12
+        colorPreviewView.translatesAutoresizingMaskIntoConstraints = false
+        colorPreviewLabel = UILabel()
+        colorPreviewLabel.text = "Color Preview"
+        colorPreviewLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        colorPreviewLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        containerView.addSubview(colorPreviewView)
+        containerView.addSubview(colorPreviewLabel)
+        view.addSubview(containerView)
+        
+        NSLayoutConstraint.activate([
+            containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            containerView.heightAnchor.constraint(equalToConstant: 60),
+            
+            colorPreviewView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            colorPreviewView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            colorPreviewView.widthAnchor.constraint(equalToConstant: 24),
+            colorPreviewView.heightAnchor.constraint(equalToConstant: 24),
+            colorPreviewLabel.leadingAnchor.constraint(equalTo: colorPreviewView.trailingAnchor, constant: 12),
+            colorPreviewLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            colorPreviewLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16)
+        ])
+        
+        updateColorPreview()
+    }
+   
+    private func applyTheme() {
+        let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
+        
+        if #available(iOS 13.0, *) {
+            view.window?.overrideUserInterfaceStyle = isDarkMode ? .dark : .light
+        } else {
+            navigationController?.navigationBar.barStyle = isDarkMode ? .black : .default
+            view.backgroundColor = isDarkMode ? .black : .white
+        }
+    }
+    private func updateColorPreview() {
+        guard let colorPreviewView = colorPreviewView,
+              let colorPreviewLabel = colorPreviewLabel else {
+            return
+        }
+        
+        guard expirationSwitch.isOn else {
+            colorPreviewView.backgroundColor = UIColor.systemGray
+            colorPreviewLabel.text = "No expiration date set"
+            return
+        }
+        
+        let selectedDate = expirationDatePicker.date
+        let calendar = Calendar.current
+        let today = Date()
+        let daysUntilExpiration = calendar.dateComponents([.day], from: today, to: selectedDate).day ?? 0
+        
+        let colorAndMessage = getExpirationColorAndMessage(daysUntilExpiration: daysUntilExpiration)
+        colorPreviewView.backgroundColor = colorAndMessage.0
+        colorPreviewLabel.text = colorAndMessage.1
+    }
+    private func getExpirationColorAndMessage(daysUntilExpiration: Int) -> (UIColor, String) {
+        if daysUntilExpiration < 0 {
+            return (.red, "Already expired")
+        } else if daysUntilExpiration <= 3 {
+            return (.red, "Expiring soon (\(daysUntilExpiration) days)")
+        } else if daysUntilExpiration <= 7 {
+            return (.orange, "Expiring in \(daysUntilExpiration) days")
+        } else {
+            return (.systemGreen, "Fresh (\(daysUntilExpiration) days left)")
+        }
+    }
+ 
+    @objc private func datePickerValueChanged() {
+        updateColorPreview()
+    }
+
     
     private func populateFields() {
         guard let item = itemToEdit else { return }
@@ -68,6 +163,10 @@ class AddEditItemViewController: UIViewController {
             expirationSwitch.isOn = false
             expirationDatePicker.isHidden = true
         }
+        
+        DispatchQueue.main.async {
+            self.updateColorPreview()
+        }
     }
     
     @IBAction func expirationSwitchChanged(_ sender: UISwitch) {
@@ -76,6 +175,8 @@ class AddEditItemViewController: UIViewController {
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
+        
+        updateColorPreview()
     }
     
     @IBAction func saveButtonTapped(_ sender: UIBarButtonItem) {
@@ -90,7 +191,6 @@ class AddEditItemViewController: UIViewController {
         let expirationDate = expirationSwitch.isOn ? expirationDatePicker.date : nil
         
         if let editingIndex = editingIndex {
-            // Update existing item
             var updatedItem = itemToEdit!
             updatedItem.name = name
             updatedItem.quantity = quantity
@@ -99,7 +199,6 @@ class AddEditItemViewController: UIViewController {
             
             delegate?.didUpdateItem(updatedItem, at: editingIndex)
         } else {
-            // Add new item
             let newItem = FridgeItem(
                 name: name,
                 quantity: quantity,
@@ -136,4 +235,3 @@ extension AddEditItemViewController: UITextFieldDelegate {
         return true
     }
 }
-

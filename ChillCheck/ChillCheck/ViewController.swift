@@ -36,7 +36,7 @@ class FridgeViewController: UIViewController {
     }
     
     private func setupUI() {
-        title = "My Fridge"
+        title = "Chill Check"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.delegate = self
