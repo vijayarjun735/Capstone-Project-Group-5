@@ -21,8 +21,11 @@ class AddEditItemViewController: UIViewController {
     @IBOutlet weak var expirationSwitch: UISwitch!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
+    
     private var colorPreviewView: UIView!
     private var colorPreviewLabel: UILabel!
+    private var favoriteButton: UIButton!
+    private var categoryPickerView: UIPickerView
     
     weak var delegate: AddEditItemDelegate?
     var itemToEdit: FridgeItem?
@@ -31,6 +34,7 @@ class AddEditItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupCategoryPicker()
         setupColorPreview()
         populateFields()
         applyTheme()
@@ -59,9 +63,32 @@ class AddEditItemViewController: UIViewController {
         categoryTextField.delegate = self
         
         quantityTextField.keyboardType = .numberPad
+        
         expirationDatePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
     }
     
+    private func setupCategoryPicker() {
+        categoryPickerView = UIPickerView()
+        categoryPickerView.delegate = self
+        categoryPickerView.dataSource = self
+        
+        categoryTextField.inputView = categoryPickerView
+        
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(categoryPickerDone))
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([flexSpace, doneButton], animated: false)
+        
+        categoryTextField.inputAccessoryView = toolbar
+    }
+    
+    @objc private func categoryPickerDone() {
+        categoryTextField.resignFirstResponder()
+    }
+    
+   
     private func setupColorPreview() {
         let containerView = UIView()
         containerView.backgroundColor = UIColor.systemBackground
@@ -73,6 +100,7 @@ class AddEditItemViewController: UIViewController {
         colorPreviewView = UIView()
         colorPreviewView.layer.cornerRadius = 12
         colorPreviewView.translatesAutoresizingMaskIntoConstraints = false
+        
         colorPreviewLabel = UILabel()
         colorPreviewLabel.text = "Color Preview"
         colorPreviewLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -85,13 +113,14 @@ class AddEditItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            containerView.bottomAnchor.constraint(equalTo: favoriteButton.topAnchor, constant: -20),
             containerView.heightAnchor.constraint(equalToConstant: 60),
             
             colorPreviewView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             colorPreviewView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             colorPreviewView.widthAnchor.constraint(equalToConstant: 24),
             colorPreviewView.heightAnchor.constraint(equalToConstant: 24),
+            
             colorPreviewLabel.leadingAnchor.constraint(equalTo: colorPreviewView.trailingAnchor, constant: 12),
             colorPreviewLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             colorPreviewLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16)
@@ -99,7 +128,7 @@ class AddEditItemViewController: UIViewController {
         
         updateColorPreview()
     }
-   
+    
     private func applyTheme() {
         let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         
@@ -110,6 +139,7 @@ class AddEditItemViewController: UIViewController {
             view.backgroundColor = isDarkMode ? .black : .white
         }
     }
+    
     private func updateColorPreview() {
         guard let colorPreviewView = colorPreviewView,
               let colorPreviewLabel = colorPreviewLabel else {
@@ -131,6 +161,7 @@ class AddEditItemViewController: UIViewController {
         colorPreviewView.backgroundColor = colorAndMessage.0
         colorPreviewLabel.text = colorAndMessage.1
     }
+    
     private func getExpirationColorAndMessage(daysUntilExpiration: Int) -> (UIColor, String) {
         if daysUntilExpiration < 0 {
             return (.red, "Already expired")
@@ -142,18 +173,25 @@ class AddEditItemViewController: UIViewController {
             return (.systemGreen, "Fresh (\(daysUntilExpiration) days left)")
         }
     }
- 
+    
     @objc private func datePickerValueChanged() {
         updateColorPreview()
     }
-
     
     private func populateFields() {
-        guard let item = itemToEdit else { return }
+        guard let item = itemToEdit else {
+            categoryTextField.text = FridgeDataManager.predefinedCategories[0]
+            return
+        }
         
         nameTextField.text = item.name
         quantityTextField.text = "\(item.quantity)"
         categoryTextField.text = item.category
+
+        
+        if let categoryIndex = FridgeDataManager.predefinedCategories.firstIndex(of: item.category) {
+            categoryPickerView.selectRow(categoryIndex, inComponent: 0, animated: false)
+        }
         
         if let expirationDate = item.expirationDate {
             expirationSwitch.isOn = true
@@ -196,6 +234,7 @@ class AddEditItemViewController: UIViewController {
             updatedItem.quantity = quantity
             updatedItem.category = category
             updatedItem.expirationDate = expirationDate
+
             
             delegate?.didUpdateItem(updatedItem, at: editingIndex)
         } else {
@@ -203,7 +242,8 @@ class AddEditItemViewController: UIViewController {
                 name: name,
                 quantity: quantity,
                 expirationDate: expirationDate,
-                category: category
+                category: category,
+
             )
             delegate?.didAddItem(newItem)
         }
@@ -235,3 +275,4 @@ extension AddEditItemViewController: UITextFieldDelegate {
         return true
     }
 }
+
