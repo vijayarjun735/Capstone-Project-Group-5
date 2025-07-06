@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Loading-VC">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Loading View Controller-->
+        <scene sceneID="Loading-Scene">
+            <objects>
+                <viewController storyboardIdentifier="LoadingViewController" id="Loading-VC" customClass="LoadingViewController" customModule="FridgeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Loading-View">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="refrigerator.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Logo-ImageView">
+                                <rect key="frame" x="136.66666666666666" y="305.66666666666669" width="119.99999999999997" height="120.66666666666669"/>
+                                <color key="tintColor" systemColor="systemBlueColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="Logo-Height"/>
+                                    <constraint firstAttribute="width" constant="120" id="Logo-Width"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Chill Check" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AppName-Label">
+                                <rect key="frame" x="40" y="446" width="313" height="43"/>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="36"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Keep your fridge organized" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tagline-Label">
+                                <rect key="frame" x="40" y="499" width="313" height="19"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="Loading-Indicator">
+                                <rect key="frame" x="186.66666666666666" y="558" width="20" height="20"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="v1.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Version-Label">
+                                <rect key="frame" x="40" y="798" width="313" height="15"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" systemColor="tertiaryLabelColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Loading-SafeArea"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="AppName-Label" firstAttribute="centerX" secondItem="Loading-View" secondAttribute="centerX" id="AppName-CenterX"/>
+                            <constraint firstItem="AppName-Label" firstAttribute="leading" secondItem="Loading-SafeArea" secondAttribute="leading" constant="40" id="AppName-Leading"/>
+                            <constraint firstItem="AppName-Label" firstAttribute="top" secondItem="Logo-ImageView" secondAttribute="bottom" constant="20" id="AppName-Top"/>
+                            <constraint firstItem="Loading-SafeArea" firstAttribute="trailing" secondItem="AppName-Label" secondAttribute="trailing" constant="40" id="AppName-Trailing"/>
+                            <constraint firstItem="Loading-Indicator" firstAttribute="centerX" secondItem="Loading-View" secondAttribute="centerX" id="Loading-CenterX"/>
+                            <constraint firstItem="Loading-Indicator" firstAttribute="top" secondItem="Tagline-Label" secondAttribute="bottom" constant="40" id="Loading-Top"/>
+                            <constraint firstItem="Logo-ImageView" firstAttribute="centerX" secondItem="Loading-View" secondAttribute="centerX" id="Logo-CenterX"/>
+                            <constraint firstItem="Logo-ImageView" firstAttribute="centerY" secondItem="Loading-View" secondAttribute="centerY" constant="-60" id="Logo-CenterY"/>
+                            <constraint firstItem="Tagline-Label" firstAttribute="centerX" secondItem="Loading-View" secondAttribute="centerX" id="Tagline-CenterX"/>
+                            <constraint firstItem="Tagline-Label" firstAttribute="leading" secondItem="Loading-SafeArea" secondAttribute="leading" constant="40" id="Tagline-Leading"/>
+                            <constraint firstItem="Tagline-Label" firstAttribute="top" secondItem="AppName-Label" secondAttribute="bottom" constant="10" id="Tagline-Top"/>
+                            <constraint firstItem="Loading-SafeArea" firstAttribute="trailing" secondItem="Tagline-Label" secondAttribute="trailing" constant="40" id="Tagline-Trailing"/>
+                            <constraint firstItem="Loading-SafeArea" firstAttribute="bottom" secondItem="Version-Label" secondAttribute="bottom" constant="5" id="Version-Bottom"/>
+                            <constraint firstItem="Version-Label" firstAttribute="centerX" secondItem="Loading-View" secondAttribute="centerX" id="Version-CenterX"/>
+                            <constraint firstItem="Version-Label" firstAttribute="leading" secondItem="Loading-SafeArea" secondAttribute="leading" constant="40" id="Version-Leading"/>
+                            <constraint firstItem="Loading-SafeArea" firstAttribute="trailing" secondItem="Version-Label" secondAttribute="trailing" constant="40" id="Version-Trailing"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="appNameLabel" destination="AppName-Label" id="AppName-Outlet"/>
+                        <outlet property="loadingIndicator" destination="Loading-Indicator" id="Loading-Outlet"/>
+                        <outlet property="logoImageView" destination="Logo-ImageView" id="Logo-Outlet"/>
+                        <outlet property="taglineLabel" destination="Tagline-Label" id="Tagline-Outlet"/>
+                        <outlet property="versionLabel" destination="Version-Label" id="Version-Outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Loading-Responder" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="refrigerator.fill" catalog="system" width="95" height="128"/>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tertiaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
