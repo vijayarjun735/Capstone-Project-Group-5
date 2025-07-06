@@ -14,6 +14,7 @@ struct FridgeItem: Codable {
     var quantity: Int
     var expirationDate: Date?
     var category: String
+    var isFavorite: Bool
     
     init(name: String, quantity: Int, expirationDate: Date? = nil, category: String = "Other", isFavorite: Bool = false) {
         self.id = UUID()
@@ -21,6 +22,7 @@ struct FridgeItem: Codable {
         self.quantity = quantity
         self.expirationDate = expirationDate
         self.category = category
+        self.isFavorite = isFavorite
     }
 }
 

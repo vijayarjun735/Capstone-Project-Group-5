@@ -68,6 +68,16 @@ class FridgeViewController: UIViewController {
         tableView.topAnchor.constraint(equalTo: itemCountLabel.bottomAnchor, constant: 8).isActive = true
     }
     
+    private func updateItemCountLabel() {
+        let displayedItems = isSearching ? filteredFridgeItems : fridgeItems
+        let favoriteCount = displayedItems.filter { $0.isFavorite }.count
+        
+        if isSearching {
+            itemCountLabel.text = "\(displayedItems.count) items found (\(favoriteCount) favorites)"
+        } else {
+            itemCountLabel.text = "\(displayedItems.count) total items (\(favoriteCount) favorites)"
+        }
+    }
     
     private func setupMenuButton() {
         let menuButton = UIBarButtonItem(

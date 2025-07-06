@@ -25,7 +25,8 @@ class AddEditItemViewController: UIViewController {
     private var colorPreviewView: UIView!
     private var colorPreviewLabel: UILabel!
     private var favoriteButton: UIButton!
-    private var categoryPickerView: UIPickerView
+    private var categoryPickerView: UIPickerView!
+    private var isFavorite: Bool = false
     
     weak var delegate: AddEditItemDelegate?
     var itemToEdit: FridgeItem?
@@ -35,6 +36,7 @@ class AddEditItemViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupCategoryPicker()
+        setupFavoriteButton()
         setupColorPreview()
         populateFields()
         applyTheme()
@@ -88,7 +90,57 @@ class AddEditItemViewController: UIViewController {
         categoryTextField.resignFirstResponder()
     }
     
-   
+    private func setupFavoriteButton() {
+        favoriteButton = UIButton(type: .custom)
+        favoriteButton.setTitle("Add to Favorites", for: .normal)
+        favoriteButton.setTitle("Remove from Favorites", for: .selected)
+        favoriteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        favoriteButton.layer.cornerRadius = 8
+        favoriteButton.layer.borderWidth = 1
+        favoriteButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
+        favoriteButton.addTarget(self, action: #selector(favoriteButtonTapped), for: .touchUpInside)
+        
+        // Remove any default button styling and highlights
+        favoriteButton.adjustsImageWhenHighlighted = false
+        favoriteButton.showsTouchWhenHighlighted = false
+        
+        view.addSubview(favoriteButton)
+        
+        NSLayoutConstraint.activate([
+            favoriteButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            favoriteButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            favoriteButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -100),
+            favoriteButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        
+        // Ensure the button is styled properly for new items
+        updateFavoriteButton()
+    }
+    
+    @objc private func favoriteButtonTapped() {
+        isFavorite.toggle()
+        updateFavoriteButton()
+    }
+    
+    private func updateFavoriteButton() {
+        favoriteButton.isSelected = isFavorite
+        
+        if isFavorite {
+            favoriteButton.backgroundColor = UIColor.systemRed.withAlphaComponent(0.1)
+            favoriteButton.setTitleColor(.systemRed, for: .normal)
+            favoriteButton.setTitleColor(.systemRed, for: .selected)
+            favoriteButton.setTitleColor(.systemRed, for: .highlighted)
+            favoriteButton.layer.borderColor = UIColor.systemRed.cgColor
+        } else {
+            favoriteButton.backgroundColor = UIColor.systemYellow.withAlphaComponent(0.1)
+            favoriteButton.setTitleColor(.systemYellow, for: .normal)
+            favoriteButton.setTitleColor(.systemYellow, for: .selected)
+            favoriteButton.setTitleColor(.systemYellow, for: .highlighted)
+            favoriteButton.layer.borderColor = UIColor.systemYellow.cgColor
+        }
+    }
+    
     private func setupColorPreview() {
         let containerView = UIView()
         containerView.backgroundColor = UIColor.systemBackground
@@ -187,7 +239,8 @@ class AddEditItemViewController: UIViewController {
         nameTextField.text = item.name
         quantityTextField.text = "\(item.quantity)"
         categoryTextField.text = item.category
-
+        isFavorite = item.isFavorite
+        updateFavoriteButton()
         
         if let categoryIndex = FridgeDataManager.predefinedCategories.firstIndex(of: item.category) {
             categoryPickerView.selectRow(categoryIndex, inComponent: 0, animated: false)
@@ -234,7 +287,7 @@ class AddEditItemViewController: UIViewController {
             updatedItem.quantity = quantity
             updatedItem.category = category
             updatedItem.expirationDate = expirationDate
-
+            updatedItem.isFavorite = isFavorite
             
             delegate?.didUpdateItem(updatedItem, at: editingIndex)
         } else {
@@ -243,7 +296,7 @@ class AddEditItemViewController: UIViewController {
                 quantity: quantity,
                 expirationDate: expirationDate,
                 category: category,
-
+                isFavorite: isFavorite
             )
             delegate?.didAddItem(newItem)
         }
@@ -276,3 +329,21 @@ extension AddEditItemViewController: UITextFieldDelegate {
     }
 }
 
+// MARK: - UIPickerViewDataSource & UIPickerViewDelegate
+extension AddEditItemViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return FridgeDataManager.predefinedCategories.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return FridgeDataManager.predefinedCategories[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        categoryTextField.text = FridgeDataManager.predefinedCategories[row]
+    }
+}
