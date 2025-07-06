@@ -16,23 +16,21 @@ class FridgeViewController: UIViewController {
     var fridgeItems: [FridgeItem] = []
     var filteredFridgeItems: [FridgeItem] = []
     var isSearching = false
- 
+    
+    private var itemCountLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupItemCountLabel()
         loadFridgeItems()
-      
         applyTheme()
-       
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadFridgeItems()
-      
         applyTheme()
-        
     }
     
     private func setupUI() {
@@ -43,15 +41,33 @@ class FridgeViewController: UIViewController {
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FridgeItemCell")
         
-    
         searchBar.delegate = self
         searchBar.placeholder = "Search fridge items..."
         searchBar.showsCancelButton = false
-     
-   
+        
         setupMenuButton()
-       
     }
+    
+    private func setupItemCountLabel() {
+        itemCountLabel = UILabel()
+        itemCountLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        itemCountLabel.textColor = .secondaryLabel
+        itemCountLabel.textAlignment = .center
+        itemCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(itemCountLabel)
+        
+        NSLayoutConstraint.activate([
+            itemCountLabel.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
+            itemCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            itemCountLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            itemCountLabel.heightAnchor.constraint(equalToConstant: 20)
+        ])
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: itemCountLabel.bottomAnchor, constant: 8).isActive = true
+    }
+    
     
     private func setupMenuButton() {
         let menuButton = UIBarButtonItem(
@@ -62,25 +78,28 @@ class FridgeViewController: UIViewController {
         )
         navigationItem.leftBarButtonItem = menuButton
     }
+    
     @objc private func menuButtonTapped() {
         performSegue(withIdentifier: "showMenu", sender: nil)
     }
+    
     private func toggleDarkMode() {
         let currentMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         UserDefaults.standard.set(!currentMode, forKey: "isDarkMode")
         applyTheme()
     }
-        private func applyTheme() {
+    
+    private func applyTheme() {
         let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         
         if #available(iOS 13.0, *) {
             view.window?.overrideUserInterfaceStyle = isDarkMode ? .dark : .light
         } else {
-            // Fallback for iOS 12 and earlier
             navigationController?.navigationBar.barStyle = isDarkMode ? .black : .default
             tableView.backgroundColor = isDarkMode ? .black : .white
         }
     }
+    
     private func confirmDeleteAllData() {
         let alertController = UIAlertController(
             title: "Delete All Data",
@@ -99,11 +118,13 @@ class FridgeViewController: UIViewController {
         
         present(alertController, animated: true)
     }
+    
     private func deleteAllData() {
         fridgeItems.removeAll()
         filteredFridgeItems.removeAll()
         saveFridgeItems()
         tableView.reloadData()
+        updateItemCountLabel()
         
         let successAlert = UIAlertController(
             title: "Success",
@@ -116,8 +137,14 @@ class FridgeViewController: UIViewController {
     
     private func loadFridgeItems() {
         fridgeItems = FridgeDataManager.shared.loadFridgeItems()
+        sortItemsByFavorites()
         filteredFridgeItems = fridgeItems
         tableView.reloadData()
+        updateItemCountLabel()
+    }
+    
+    private func sortItemsByFavorites() {
+        fridgeItems.sort { $0.isFavorite && !$1.isFavorite }
     }
     
     private func saveFridgeItems() {
@@ -176,7 +203,6 @@ class FridgeViewController: UIViewController {
     }
 }
 
-
 extension FridgeViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
@@ -188,8 +214,10 @@ extension FridgeViewController: UISearchBarDelegate {
                 item.name.lowercased().contains(searchText.lowercased()) ||
                 item.category.lowercased().contains(searchText.lowercased())
             }
+            filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
         }
         tableView.reloadData()
+        updateItemCountLabel()
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -203,13 +231,13 @@ extension FridgeViewController: UISearchBarDelegate {
         isSearching = false
         filteredFridgeItems = fridgeItems
         tableView.reloadData()
+        updateItemCountLabel()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
     }
 }
-
 
 // MARK: - TableView DataSource and Delegate
 extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
@@ -232,15 +260,30 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
         
         cell.textLabel?.text = item.name
         cell.detailTextLabel?.text = subtitle
-        cell.accessoryType = .disclosureIndicator
+        
+        if item.isFavorite {
+            let starImageView = UIImageView(image: UIImage(systemName: "star.fill"))
+            starImageView.tintColor = .systemYellow
+            starImageView.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            cell.accessoryView = starImageView
+        } else {
+            cell.accessoryView = nil
+            cell.accessoryType = .disclosureIndicator
+        }
         
         let expirationColor = getExpirationColor(for: item)
         cell.textLabel?.textColor = expirationColor
         
-        // Add a colored indicator view
+        cell.contentView.subviews.forEach { view in
+            if view.tag == 999 {
+                view.removeFromSuperview()
+            }
+        }
+        
         if item.expirationDate != nil {
             let indicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 4, height: 44))
             indicatorView.backgroundColor = expirationColor
+            indicatorView.tag = 999
             cell.contentView.addSubview(indicatorView)
             indicatorView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -273,6 +316,7 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
             
             tableView.deleteRows(at: [indexPath], with: .fade)
             saveFridgeItems()
+            updateItemCountLabel()
         }
     }
 }
@@ -281,19 +325,23 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
 extension FridgeViewController: AddEditItemDelegate {
     func didAddItem(_ item: FridgeItem) {
         fridgeItems.append(item)
+        sortItemsByFavorites()
         saveFridgeItems()
         if isSearching {
             let searchText = searchBar.text ?? ""
             if item.name.lowercased().contains(searchText.lowercased()) ||
                item.category.lowercased().contains(searchText.lowercased()) {
                 filteredFridgeItems.append(item)
+                filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
             }
         }
         tableView.reloadData()
+        updateItemCountLabel()
     }
     
     func didUpdateItem(_ item: FridgeItem, at index: Int) {
         fridgeItems[index] = item
+        sortItemsByFavorites()
         saveFridgeItems()
         if isSearching {
             if let filteredIndex = filteredFridgeItems.firstIndex(where: { $0.id == item.id }) {
@@ -301,15 +349,18 @@ extension FridgeViewController: AddEditItemDelegate {
                 if item.name.lowercased().contains(searchText.lowercased()) ||
                    item.category.lowercased().contains(searchText.lowercased()) {
                     filteredFridgeItems[filteredIndex] = item
+                    filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
                 } else {
                     filteredFridgeItems.remove(at: filteredIndex)
                 }
             }
         }
         tableView.reloadData()
+        updateItemCountLabel()
     }
 }
 
+// MARK: - Menu Delegate
 extension FridgeViewController: MenuDelegate {
     func didSelectDarkModeToggle() {
         toggleDarkMode()
