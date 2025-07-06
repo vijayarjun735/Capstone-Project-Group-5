@@ -15,7 +15,7 @@ struct FridgeItem: Codable {
     var expirationDate: Date?
     var category: String
     
-    init(name: String, quantity: Int, expirationDate: Date? = nil, category: String = "Other") {
+    init(name: String, quantity: Int, expirationDate: Date? = nil, category: String = "Other", isFavorite: Bool = false) {
         self.id = UUID()
         self.name = name
         self.quantity = quantity
@@ -54,4 +54,17 @@ class FridgeDataManager {
             return []
         }
     }
+    
+    static let predefinedCategories = [
+        "Dairy",
+        "Meat",
+        "Vegetables",
+        "Fruits",
+        "Beverages",
+        "Snacks",
+        "Frozen",
+        "Condiments",
+        "Grains",
+        "Other"
+    ]
 }
