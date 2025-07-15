@@ -7,6 +7,8 @@
 
 import UIKit
 
+import UIKit
+
 class FridgeViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
@@ -16,13 +18,16 @@ class FridgeViewController: UIViewController {
     var fridgeItems: [FridgeItem] = []
     var filteredFridgeItems: [FridgeItem] = []
     var isSearching = false
+    var currentFilter: ExpiryFilter = .all
     
     private var itemCountLabel: UILabel!
+    private var filterStatusLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupItemCountLabel()
+        setupFilterStatusLabel()
         loadFridgeItems()
         applyTheme()
     }
@@ -63,9 +68,27 @@ class FridgeViewController: UIViewController {
             itemCountLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             itemCountLabel.heightAnchor.constraint(equalToConstant: 20)
         ])
+    }
+    
+    private func setupFilterStatusLabel() {
+        filterStatusLabel = UILabel()
+        filterStatusLabel.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        filterStatusLabel.textColor = .systemBlue
+        filterStatusLabel.textAlignment = .center
+        filterStatusLabel.translatesAutoresizingMaskIntoConstraints = false
+        filterStatusLabel.isHidden = true
+        
+        view.addSubview(filterStatusLabel)
+        
+        NSLayoutConstraint.activate([
+            filterStatusLabel.topAnchor.constraint(equalTo: itemCountLabel.bottomAnchor, constant: 4),
+            filterStatusLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            filterStatusLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            filterStatusLabel.heightAnchor.constraint(equalToConstant: 16)
+        ])
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: itemCountLabel.bottomAnchor, constant: 8).isActive = true
+        tableView.topAnchor.constraint(equalTo: filterStatusLabel.bottomAnchor, constant: 8).isActive = true
     }
     
     private func updateItemCountLabel() {
@@ -76,6 +99,15 @@ class FridgeViewController: UIViewController {
             itemCountLabel.text = "\(displayedItems.count) items found (\(favoriteCount) favorites)"
         } else {
             itemCountLabel.text = "\(displayedItems.count) total items (\(favoriteCount) favorites)"
+        }
+    }
+    
+    private func updateFilterStatusLabel() {
+        if currentFilter == .all {
+            filterStatusLabel.isHidden = true
+        } else {
+            filterStatusLabel.isHidden = false
+            filterStatusLabel.text = "Filtered by: \(currentFilter.rawValue) • Tap menu to change"
         }
     }
     
@@ -148,9 +180,9 @@ class FridgeViewController: UIViewController {
     private func loadFridgeItems() {
         fridgeItems = FridgeDataManager.shared.loadFridgeItems()
         sortItemsByFavorites()
-        filteredFridgeItems = fridgeItems
-        tableView.reloadData()
+        applyCurrentFilter()
         updateItemCountLabel()
+        updateFilterStatusLabel()
     }
     
     private func sortItemsByFavorites() {
@@ -159,6 +191,55 @@ class FridgeViewController: UIViewController {
     
     private func saveFridgeItems() {
         FridgeDataManager.shared.saveFridgeItems(fridgeItems)
+    }
+    
+    private func applyCurrentFilter() {
+        let itemsToFilter = fridgeItems
+        
+        switch currentFilter {
+        case .all:
+            filteredFridgeItems = itemsToFilter
+        case .expired:
+            filteredFridgeItems = itemsToFilter.filter { item in
+                guard let expirationDate = item.expirationDate else { return false }
+                return expirationDate < Date()
+            }
+        case .expiringSoon:
+            filteredFridgeItems = itemsToFilter.filter { item in
+                guard let expirationDate = item.expirationDate else { return false }
+                let calendar = Calendar.current
+                let daysUntilExpiration = calendar.dateComponents([.day], from: Date(), to: expirationDate).day ?? 0
+                return daysUntilExpiration >= 0 && daysUntilExpiration <= 3
+            }
+        case .expiringThisWeek:
+            filteredFridgeItems = itemsToFilter.filter { item in
+                guard let expirationDate = item.expirationDate else { return false }
+                let calendar = Calendar.current
+                let daysUntilExpiration = calendar.dateComponents([.day], from: Date(), to: expirationDate).day ?? 0
+                return daysUntilExpiration >= 4 && daysUntilExpiration <= 7
+            }
+        case .fresh:
+            filteredFridgeItems = itemsToFilter.filter { item in
+                guard let expirationDate = item.expirationDate else { return false }
+                let calendar = Calendar.current
+                let daysUntilExpiration = calendar.dateComponents([.day], from: Date(), to: expirationDate).day ?? 0
+                return daysUntilExpiration >= 8
+            }
+        case .noExpiration:
+            filteredFridgeItems = itemsToFilter.filter { $0.expirationDate == nil }
+        }
+        
+        // Apply search filter if currently searching
+        if isSearching, let searchText = searchBar.text, !searchText.isEmpty {
+            filteredFridgeItems = filteredFridgeItems.filter { item in
+                item.name.lowercased().contains(searchText.lowercased()) ||
+                item.category.lowercased().contains(searchText.lowercased())
+            }
+        }
+        
+        // Sort filtered items by favorites
+        filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
+        tableView.reloadData()
     }
     
     private func getExpirationColor(for item: FridgeItem) -> UIColor {
@@ -181,6 +262,23 @@ class FridgeViewController: UIViewController {
         }
     }
     
+    private func showHistory() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let historyNav = storyboard.instantiateViewController(withIdentifier: "HistoryNav") as? UINavigationController {
+            present(historyNav, animated: true)
+        }
+    }
+    
+    private func showFilter() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let filterNav = storyboard.instantiateViewController(withIdentifier: "FilterNav") as? UINavigationController,
+           let filterVC = filterNav.topViewController as? FilterViewController {
+            filterVC.delegate = self
+            filterVC.currentFilter = currentFilter
+            present(filterNav, animated: true)
+        }
+    }
+    
     @IBAction func addButtonTapped(_ sender: UIBarButtonItem) {
         performSegue(withIdentifier: "showAddItem", sender: nil)
     }
@@ -196,12 +294,10 @@ class FridgeViewController: UIViewController {
                let editItemVC = navController.topViewController as? AddEditItemViewController,
                let indexPath = sender as? IndexPath {
                 editItemVC.delegate = self
-                let itemsArray = isSearching ? filteredFridgeItems : fridgeItems
+                let itemsArray = filteredFridgeItems
                 editItemVC.itemToEdit = itemsArray[indexPath.row]
-                if isSearching {
-                    editItemVC.editingIndex = fridgeItems.firstIndex { $0.id == itemsArray[indexPath.row].id }
-                } else {
-                    editItemVC.editingIndex = indexPath.row
+                if let originalIndex = fridgeItems.firstIndex(where: { $0.id == itemsArray[indexPath.row].id }) {
+                    editItemVC.editingIndex = originalIndex
                 }
             }
         } else if segue.identifier == "showMenu" {
@@ -217,16 +313,10 @@ extension FridgeViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
             isSearching = false
-            filteredFridgeItems = fridgeItems
         } else {
             isSearching = true
-            filteredFridgeItems = fridgeItems.filter { item in
-                item.name.lowercased().contains(searchText.lowercased()) ||
-                item.category.lowercased().contains(searchText.lowercased())
-            }
-            filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
         }
-        tableView.reloadData()
+        applyCurrentFilter()
         updateItemCountLabel()
     }
     
@@ -239,8 +329,7 @@ extension FridgeViewController: UISearchBarDelegate {
         searchBar.showsCancelButton = false
         searchBar.resignFirstResponder()
         isSearching = false
-        filteredFridgeItems = fridgeItems
-        tableView.reloadData()
+        applyCurrentFilter()
         updateItemCountLabel()
     }
     
@@ -253,12 +342,12 @@ extension FridgeViewController: UISearchBarDelegate {
 extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return isSearching ? filteredFridgeItems.count : fridgeItems.count
+        return filteredFridgeItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "FridgeItemCell", for: indexPath)
-        let item = isSearching ? filteredFridgeItems[indexPath.row] : fridgeItems[indexPath.row]
+        let item = filteredFridgeItems[indexPath.row]
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
@@ -314,15 +403,13 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            if isSearching {
-                let itemToDelete = filteredFridgeItems[indexPath.row]
-                if let originalIndex = fridgeItems.firstIndex(where: { $0.id == itemToDelete.id }) {
-                    fridgeItems.remove(at: originalIndex)
-                }
-                filteredFridgeItems.remove(at: indexPath.row)
-            } else {
-                fridgeItems.remove(at: indexPath.row)
+            let itemToDelete = filteredFridgeItems[indexPath.row]
+            
+            
+            if let originalIndex = fridgeItems.firstIndex(where: { $0.id == itemToDelete.id }) {
+                fridgeItems.remove(at: originalIndex)
             }
+            filteredFridgeItems.remove(at: indexPath.row)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
             saveFridgeItems()
@@ -337,15 +424,9 @@ extension FridgeViewController: AddEditItemDelegate {
         fridgeItems.append(item)
         sortItemsByFavorites()
         saveFridgeItems()
-        if isSearching {
-            let searchText = searchBar.text ?? ""
-            if item.name.lowercased().contains(searchText.lowercased()) ||
-               item.category.lowercased().contains(searchText.lowercased()) {
-                filteredFridgeItems.append(item)
-                filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
-            }
-        }
-        tableView.reloadData()
+)
+        
+        applyCurrentFilter()
         updateItemCountLabel()
     }
     
@@ -353,19 +434,7 @@ extension FridgeViewController: AddEditItemDelegate {
         fridgeItems[index] = item
         sortItemsByFavorites()
         saveFridgeItems()
-        if isSearching {
-            if let filteredIndex = filteredFridgeItems.firstIndex(where: { $0.id == item.id }) {
-                let searchText = searchBar.text ?? ""
-                if item.name.lowercased().contains(searchText.lowercased()) ||
-                   item.category.lowercased().contains(searchText.lowercased()) {
-                    filteredFridgeItems[filteredIndex] = item
-                    filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
-                } else {
-                    filteredFridgeItems.remove(at: filteredIndex)
-                }
-            }
-        }
-        tableView.reloadData()
+        applyCurrentFilter()
         updateItemCountLabel()
     }
 }
@@ -378,5 +447,19 @@ extension FridgeViewController: MenuDelegate {
     
     func didSelectDeleteAllData() {
         confirmDeleteAllData()
+    }
+    
+    func didSelectFilter() {
+        showFilter()
+    }
+}
+
+// MARK: - Filter Delegate
+extension FridgeViewController: FilterDelegate {
+    func didApplyFilter(_ filter: ExpiryFilter) {
+        currentFilter = filter
+        applyCurrentFilter()
+        updateItemCountLabel()
+        updateFilterStatusLabel()
     }
 }

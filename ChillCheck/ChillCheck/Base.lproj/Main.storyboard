@@ -39,7 +39,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Main-TableView">
-                                <rect key="frame" x="0.0" y="187" width="393" height="631"/>
+                                <rect key="frame" x="0.0" y="207" width="393" height="611"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="FridgeItemCell" textLabel="Cell-Title" detailTextLabel="Cell-Subtitle" style="IBUITableViewCellStyleSubtitle" id="Table-Cell">
@@ -75,7 +75,7 @@
                             <constraint firstItem="Search-Bar" firstAttribute="top" secondItem="Main-SafeArea" secondAttribute="top" id="Search-Top"/>
                             <constraint firstItem="Search-Bar" firstAttribute="leading" secondItem="Main-SafeArea" secondAttribute="leading" id="Search-Leading"/>
                             <constraint firstItem="Main-SafeArea" firstAttribute="trailing" secondItem="Search-Bar" secondAttribute="trailing" id="Search-Trailing"/>
-                            <constraint firstItem="Main-TableView" firstAttribute="top" secondItem="Search-Bar" secondAttribute="bottom" constant="28" id="Table-Top"/>
+                            <constraint firstItem="Main-TableView" firstAttribute="top" secondItem="Search-Bar" secondAttribute="bottom" constant="48" id="Table-Top"/>
                             <constraint firstItem="Main-TableView" firstAttribute="leading" secondItem="Main-SafeArea" secondAttribute="leading" id="Table-Leading"/>
                             <constraint firstItem="Main-SafeArea" firstAttribute="bottom" secondItem="Main-TableView" secondAttribute="bottom" id="Table-Bottom"/>
                             <constraint firstItem="Main-SafeArea" firstAttribute="trailing" secondItem="Main-TableView" secondAttribute="trailing" id="Table-Trailing"/>
@@ -283,7 +283,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Menu-Stack">
-                                <rect key="frame" x="20" y="133" width="353" height="152"/>
+                                <rect key="frame" x="20" y="133" width="353" height="264"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DarkMode-Button">
                                         <rect key="frame" x="0.0" y="0.0" width="353" height="56"/>
@@ -296,7 +296,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DeleteAll-Button">
-                                        <rect key="frame" x="0.0" y="76" width="353" height="56"/>
+                                        <rect key="frame" x="0.0" y="208" width="353" height="56"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="56" id="DeleteAll-Height"/>
                                         </constraints>
@@ -332,6 +332,72 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Menu-Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2887.7862595419846" y="700"/>
+        </scene>
+        <!--Filter View Controller-->
+        <scene sceneID="Filter-Scene">
+            <objects>
+                <viewController id="Filter-VC" customClass="FilterViewController" customModule="FridgeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Filter-View">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Filter-TableView">
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="FilterCell" textLabel="Filter-Cell-Title" detailTextLabel="Filter-Cell-Subtitle" style="IBUITableViewCellStyleSubtitle" id="Filter-Table-Cell">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Filter-Table-Cell" id="Filter-Cell-Content">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Filter-Cell-Title">
+                                                    <rect key="frame" x="20" y="6.0000000000000009" width="25" height="14.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Filter-Cell-Subtitle">
+                                                    <rect key="frame" x="19.999999999999996" y="22.333333333333336" width="40.333333333333336" height="13.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Filter-SafeArea"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Filter-TableView" firstAttribute="top" secondItem="Filter-SafeArea" secondAttribute="top" id="Filter-Table-Top"/>
+                            <constraint firstItem="Filter-TableView" firstAttribute="leading" secondItem="Filter-SafeArea" secondAttribute="leading" id="Filter-Table-Leading"/>
+                            <constraint firstItem="Filter-SafeArea" firstAttribute="bottom" secondItem="Filter-TableView" secondAttribute="bottom" id="Filter-Table-Bottom"/>
+                            <constraint firstItem="Filter-SafeArea" firstAttribute="trailing" secondItem="Filter-TableView" secondAttribute="trailing" id="Filter-Table-Trailing"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Filter-NavItem">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Filter-Cancel-Button">
+                            <connections>
+                                <action selector="cancelButtonTapped:" destination="Filter-VC" id="Filter-Cancel-Action"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Reset" id="Filter-Reset-Button"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cancelButton" destination="Filter-Cancel-Button" id="Filter-Cancel-Outlet"/>
+                        <outlet property="resetButton" destination="Filter-Reset-Button" id="Filter-Reset-Outlet"/>
+                        <outlet property="tableView" destination="Filter-TableView" id="Filter-Table-Outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Filter-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2887.7862595419846" y="1400"/>
         </scene>
     </scenes>
     <resources>
