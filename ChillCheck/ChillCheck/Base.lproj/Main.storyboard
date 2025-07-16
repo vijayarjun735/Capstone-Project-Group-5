@@ -295,6 +295,20 @@
                                             <action selector="darkModeButtonTapped:" destination="Menu-VC" eventType="touchUpInside" id="DarkMode-Action"/>
                                         </connections>
                                     </button>
+<!--                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="History-Button">-->
+<!--                                        <rect key="frame" x="0.0" y="76" width="353" height="56"/>-->
+<!--                                        <constraints>-->
+<!--                                            <constraint firstAttribute="height" constant="56" id="History-Height"/>-->
+<!--                                        </constraints>-->
+<!--                                        <state key="normal" title="View History"/>-->
+<!--                                    </button>-->
+<!--                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Filter-Button">-->
+<!--                                        <rect key="frame" x="0.0" y="152" width="353" height="56"/>-->
+<!--                                        <constraints>-->
+<!--                                            <constraint firstAttribute="height" constant="56" id="Filter-Height"/>-->
+<!--                                        </constraints>-->
+<!--                                        <state key="normal" title="Filter by Expiry"/>-->
+<!--                                    </button>-->
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DeleteAll-Button">
                                         <rect key="frame" x="0.0" y="208" width="353" height="56"/>
                                         <constraints>
@@ -332,6 +346,122 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Menu-Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2887.7862595419846" y="700"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="History-Nav-Scene">
+            <objects>
+                <navigationController storyboardIdentifier="HistoryNav" automaticallyAdjustsScrollViewInsets="NO" id="History-Nav" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="History-NavBar">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="History-VC" kind="relationship" relationship="rootViewController" id="History-Nav-To-History"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="History-Nav-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="103.05343511450382" y="1400"/>
+        </scene>
+        <!--History View Controller-->
+        <scene sceneID="History-Scene">
+            <objects>
+                <viewController id="History-VC" customClass="HistoryViewController" customModule="FridgeApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="History-View">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="History-SegmentedControl">
+                                <rect key="frame" x="20" y="123" width="353" height="32"/>
+                                <segments>
+                                    <segment title="Recently Added"/>
+                                    <segment title="Recently Deleted"/>
+                                </segments>
+                                <connections>
+                                    <action selector="segmentedControlValueChanged:" destination="History-VC" eventType="valueChanged" id="Segment-Action"/>
+                                </connections>
+                            </segmentedControl>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="History-TableView">
+                                <rect key="frame" x="0.0" y="174" width="393" height="644"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="HistoryCell" textLabel="History-Cell-Title" detailTextLabel="History-Cell-Subtitle" style="IBUITableViewCellStyleSubtitle" id="History-Table-Cell">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="History-Table-Cell" id="History-Cell-Content">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="History-Cell-Title">
+                                                    <rect key="frame" x="20" y="6.0000000000000009" width="25" height="14.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="History-Cell-Subtitle">
+                                                    <rect key="frame" x="19.999999999999996" y="22.333333333333336" width="40.333333333333336" height="13.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                    <nil key="highlightedTextColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="History-SafeArea"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="History-SegmentedControl" firstAttribute="top" secondItem="History-SafeArea" secondAttribute="top" constant="20" id="Segment-Top"/>
+                            <constraint firstItem="History-SegmentedControl" firstAttribute="leading" secondItem="History-SafeArea" secondAttribute="leading" constant="20" id="Segment-Leading"/>
+                            <constraint firstItem="History-SafeArea" firstAttribute="trailing" secondItem="History-SegmentedControl" secondAttribute="trailing" constant="20" id="Segment-Trailing"/>
+                            <constraint firstItem="History-TableView" firstAttribute="top" secondItem="History-SegmentedControl" secondAttribute="bottom" constant="20" id="History-Table-Top"/>
+                            <constraint firstItem="History-TableView" firstAttribute="leading" secondItem="History-SafeArea" secondAttribute="leading" id="History-Table-Leading"/>
+                            <constraint firstItem="History-SafeArea" firstAttribute="bottom" secondItem="History-TableView" secondAttribute="bottom" id="History-Table-Bottom"/>
+                            <constraint firstItem="History-SafeArea" firstAttribute="trailing" secondItem="History-TableView" secondAttribute="trailing" id="History-Table-Trailing"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="History-NavItem">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="History-Cancel-Button">
+                            <connections>
+                                <action selector="cancelButtonTapped:" destination="History-VC" id="History-Cancel-Action"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Clear" id="History-Clear-Button"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cancelButton" destination="History-Cancel-Button" id="History-Cancel-Outlet"/>
+                        <outlet property="clearHistoryButton" destination="History-Clear-Button" id="History-Clear-Outlet"/>
+                        <outlet property="segmentedControl" destination="History-SegmentedControl" id="History-Segment-Outlet"/>
+                        <outlet property="tableView" destination="History-TableView" id="History-Table-Outlet"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="History-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1031.2977099236641" y="1400"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Filter-Nav-Scene">
+            <objects>
+                <navigationController storyboardIdentifier="FilterNav" automaticallyAdjustsScrollViewInsets="NO" id="Filter-Nav" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Filter-NavBar">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Filter-VC" kind="relationship" relationship="rootViewController" id="Filter-Nav-To-Filter"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Filter-Nav-Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1959.5419847328244" y="1400"/>
         </scene>
         <!--Filter View Controller-->
         <scene sceneID="Filter-Scene">

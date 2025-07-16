@@ -1,8 +1,8 @@
 //
-//  FridgeItem.swift
+//  HistoryItem.swift
 //  ChillCheck
 //
-//  Created by JAISON ABRAHAM on 2025-06-04.
+//  Created by Arjun V on 2025-07-16.
 //
 
 import Foundation

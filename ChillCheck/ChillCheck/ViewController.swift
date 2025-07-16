@@ -7,8 +7,6 @@
 
 import UIKit
 
-import UIKit
-
 class FridgeViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
@@ -405,6 +403,8 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
         if editingStyle == .delete {
             let itemToDelete = filteredFridgeItems[indexPath.row]
             
+            // Add to history before deleting
+            FridgeDataManager.shared.addHistoryItem(itemToDelete, action: .removed)
             
             if let originalIndex = fridgeItems.firstIndex(where: { $0.id == itemToDelete.id }) {
                 fridgeItems.remove(at: originalIndex)
@@ -424,16 +424,23 @@ extension FridgeViewController: AddEditItemDelegate {
         fridgeItems.append(item)
         sortItemsByFavorites()
         saveFridgeItems()
-)
+        
+        // Add to history
+        FridgeDataManager.shared.addHistoryItem(item, action: .added)
         
         applyCurrentFilter()
         updateItemCountLabel()
     }
     
     func didUpdateItem(_ item: FridgeItem, at index: Int) {
+        let oldItem = fridgeItems[index]
         fridgeItems[index] = item
         sortItemsByFavorites()
         saveFridgeItems()
+        
+        // Add to history
+        FridgeDataManager.shared.addHistoryItem(item, action: .updated)
+        
         applyCurrentFilter()
         updateItemCountLabel()
     }
@@ -447,6 +454,10 @@ extension FridgeViewController: MenuDelegate {
     
     func didSelectDeleteAllData() {
         confirmDeleteAllData()
+    }
+    
+    func didSelectHistory() {
+        showHistory()
     }
     
     func didSelectFilter() {
