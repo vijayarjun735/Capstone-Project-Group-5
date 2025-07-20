@@ -12,6 +12,7 @@ protocol MenuDelegate: AnyObject {
     func didSelectDeleteAllData()
     func didSelectHistory()
     func didSelectFilter()
+    func didSelectSuggestions()
 }
 
 class MenuViewController: UIViewController {
@@ -21,6 +22,7 @@ class MenuViewController: UIViewController {
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     private var historyButton: UIButton!
     private var filterButton: UIButton!
+    private var suggestionsButton: UIButton!
     private var stackView: UIStackView!
     
     weak var delegate: MenuDelegate?
@@ -35,39 +37,47 @@ class MenuViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         applyTheme()
+        updateSuggestionsButton()
     }
     
     private func setupUI() {
         title = "Menu"
-        
-        // Update button titles based on current state
+
         updateDarkModeButton()
-        
-        // Setup existing button styles
+  
         setupButtonStyle(darkModeButton, backgroundColor: UIColor.systemGray6, textColor: UIColor.label)
         setupButtonStyle(deleteAllButton, backgroundColor: UIColor.systemRed.withAlphaComponent(0.1), textColor: UIColor.systemRed)
     }
     
     private func setupNewButtons() {
-        // Create history button
+  
+        suggestionsButton = UIButton(type: .system)
+        suggestionsButton.setTitle("Use Today", for: .normal)
+        suggestionsButton.addTarget(self, action: #selector(suggestionsButtonTapped), for: .touchUpInside)
+        setupButtonStyle(suggestionsButton, backgroundColor: UIColor.systemOrange.withAlphaComponent(0.15), textColor: UIColor.systemOrange)
+    
+        suggestionsButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        suggestionsButton.layer.borderWidth = 1.5
+        suggestionsButton.layer.borderColor = UIColor.systemOrange.withAlphaComponent(0.3).cgColor
+
         historyButton = UIButton(type: .system)
         historyButton.setTitle("View History", for: .normal)
         historyButton.addTarget(self, action: #selector(historyButtonTapped), for: .touchUpInside)
         setupButtonStyle(historyButton, backgroundColor: UIColor.systemBlue.withAlphaComponent(0.1), textColor: UIColor.systemBlue)
-        
-        // Create filter button
+   
         filterButton = UIButton(type: .system)
         filterButton.setTitle("Filter by Expiry", for: .normal)
         filterButton.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         setupButtonStyle(filterButton, backgroundColor: UIColor.systemGreen.withAlphaComponent(0.1), textColor: UIColor.systemGreen)
-        
-        // Find the existing stack view and add new buttons
+    
         if let existingStackView = view.subviews.first(where: { $0 is UIStackView }) as? UIStackView {
-            // Insert history button before delete button
+      
+            existingStackView.insertArrangedSubview(suggestionsButton, at: 0)
+      
             existingStackView.insertArrangedSubview(historyButton, at: existingStackView.arrangedSubviews.count - 1)
             existingStackView.insertArrangedSubview(filterButton, at: existingStackView.arrangedSubviews.count - 1)
-            
-            // Add height constraints
+       
+            suggestionsButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
             historyButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
             filterButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
         }
@@ -86,6 +96,46 @@ class MenuViewController: UIViewController {
         let currentMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         let title = currentMode ? "Switch to Light Mode" : "Switch to Dark Mode"
         darkModeButton.setTitle(title, for: .normal)
+    }
+    
+    private func updateSuggestionsButton() {
+        guard suggestionsButton != nil else { return }
+        
+        let allItems = FridgeDataManager.shared.loadFridgeItems()
+        let calendar = Calendar.current
+        let today = Date()
+        
+        var urgentCount = 0
+        
+        for item in allItems {
+            guard let expirationDate = item.expirationDate else { continue }
+            let daysUntilExpiration = calendar.dateComponents([.day], from: today, to: expirationDate).day ?? 0
+   
+            if daysUntilExpiration <= 2 {
+                urgentCount += 1
+            }
+        }
+        
+        if urgentCount > 0 {
+            suggestionsButton.setTitle("Use Today (\(urgentCount))", for: .normal)
+   
+            let pulseAnimation = CABasicAnimation(keyPath: "transform.scale")
+            pulseAnimation.duration = 1.0
+            pulseAnimation.fromValue = 1.0
+            pulseAnimation.toValue = 1.05
+            pulseAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            pulseAnimation.autoreverses = true
+            pulseAnimation.repeatCount = Float.infinity
+            suggestionsButton.layer.add(pulseAnimation, forKey: "pulse")
+ 
+            suggestionsButton.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.2)
+            suggestionsButton.layer.borderColor = UIColor.systemOrange.cgColor
+        } else {
+            suggestionsButton.setTitle("Use Today", for: .normal)
+            suggestionsButton.layer.removeAnimation(forKey: "pulse")
+            suggestionsButton.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.1)
+            suggestionsButton.layer.borderColor = UIColor.systemOrange.withAlphaComponent(0.3).cgColor
+        }
     }
     
     private func applyTheme() {
@@ -111,6 +161,12 @@ class MenuViewController: UIViewController {
         }
     }
     
+    @objc private func suggestionsButtonTapped() {
+        dismiss(animated: true) {
+            self.delegate?.didSelectSuggestions()
+        }
+    }
+    
     @objc private func historyButtonTapped() {
         dismiss(animated: true) {
             self.delegate?.didSelectHistory()
@@ -127,4 +183,3 @@ class MenuViewController: UIViewController {
         dismiss(animated: true)
     }
 }
-

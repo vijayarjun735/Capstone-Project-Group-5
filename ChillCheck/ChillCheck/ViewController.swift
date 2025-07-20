@@ -226,16 +226,14 @@ class FridgeViewController: UIViewController {
         case .noExpiration:
             filteredFridgeItems = itemsToFilter.filter { $0.expirationDate == nil }
         }
-        
-        // Apply search filter if currently searching
+     
         if isSearching, let searchText = searchBar.text, !searchText.isEmpty {
             filteredFridgeItems = filteredFridgeItems.filter { item in
                 item.name.lowercased().contains(searchText.lowercased()) ||
                 item.category.lowercased().contains(searchText.lowercased())
             }
         }
-        
-        // Sort filtered items by favorites
+
         filteredFridgeItems.sort { $0.isFavorite && !$1.isFavorite }
         tableView.reloadData()
     }
@@ -274,6 +272,13 @@ class FridgeViewController: UIViewController {
             filterVC.delegate = self
             filterVC.currentFilter = currentFilter
             present(filterNav, animated: true)
+        }
+    }
+    
+    private func showSuggestions() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let suggestionsNav = storyboard.instantiateViewController(withIdentifier: "SuggestionsNav") as? UINavigationController {
+            present(suggestionsNav, animated: true)
         }
     }
     
@@ -402,8 +407,7 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let itemToDelete = filteredFridgeItems[indexPath.row]
-            
-            // Add to history before deleting
+ 
             FridgeDataManager.shared.addHistoryItem(itemToDelete, action: .removed)
             
             if let originalIndex = fridgeItems.firstIndex(where: { $0.id == itemToDelete.id }) {
@@ -424,8 +428,7 @@ extension FridgeViewController: AddEditItemDelegate {
         fridgeItems.append(item)
         sortItemsByFavorites()
         saveFridgeItems()
-        
-        // Add to history
+    
         FridgeDataManager.shared.addHistoryItem(item, action: .added)
         
         applyCurrentFilter()
@@ -437,8 +440,6 @@ extension FridgeViewController: AddEditItemDelegate {
         fridgeItems[index] = item
         sortItemsByFavorites()
         saveFridgeItems()
-        
-        // Add to history
         FridgeDataManager.shared.addHistoryItem(item, action: .updated)
         
         applyCurrentFilter()
@@ -462,6 +463,10 @@ extension FridgeViewController: MenuDelegate {
     
     func didSelectFilter() {
         showFilter()
+    }
+    
+    func didSelectSuggestions() {
+        showSuggestions()
     }
 }
 

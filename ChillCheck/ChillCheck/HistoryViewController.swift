@@ -33,15 +33,12 @@ class HistoryViewController: UIViewController {
     private func setupUI() {
         title = "History"
         
-        // Setup segmented control
         segmentedControl.selectedSegmentIndex = 0
         
-        // Setup table view
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "HistoryCell")
         
-        // Setup clear history button
         clearHistoryButton.target = self
         clearHistoryButton.action = #selector(clearHistoryButtonTapped)
     }

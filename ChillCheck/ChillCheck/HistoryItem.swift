@@ -7,67 +7,64 @@
 
 import Foundation
 
-// MARK: - FridgeItem Model
-struct FridgeItem: Codable {
+// MARK: - History Item Model
+struct HistoryItem: Codable {
     var id: UUID
-    var name: String
-    var quantity: Int
-    var expirationDate: Date?
-    var category: String
-    var isFavorite: Bool
+    var fridgeItem: FridgeItem
+    var action: HistoryAction
+    var timestamp: Date
     
-    init(name: String, quantity: Int, expirationDate: Date? = nil, category: String = "Other", isFavorite: Bool = false) {
+    init(fridgeItem: FridgeItem, action: HistoryAction) {
         self.id = UUID()
-        self.name = name
-        self.quantity = quantity
-        self.expirationDate = expirationDate
-        self.category = category
-        self.isFavorite = isFavorite
+        self.fridgeItem = fridgeItem
+        self.action = action
+        self.timestamp = Date()
     }
 }
 
-// MARK: - Data Manager for Persistence
-class FridgeDataManager {
-    static let shared = FridgeDataManager()
-    private let userDefaults = UserDefaults.standard
-    private let fridgeItemsKey = "FridgeItems"
+enum HistoryAction: String, Codable {
+    case added = "Added"
+    case removed = "Removed"
+    case updated = "Updated"
+}
+
+// MARK: - History Data Manager Extension
+extension FridgeDataManager {
+    private var historyItemsKey: String { "HistoryItems" }
     
-    private init() {}
-    
-    func saveFridgeItems(_ items: [FridgeItem]) {
+    func saveHistoryItems(_ items: [HistoryItem]) {
         do {
             let data = try JSONEncoder().encode(items)
-            userDefaults.set(data, forKey: fridgeItemsKey)
+            UserDefaults.standard.set(data, forKey: historyItemsKey)
         } catch {
-            print("Failed to save fridge items: \(error)")
+            print("Failed to save history items: \(error)")
         }
     }
     
-    func loadFridgeItems() -> [FridgeItem] {
-        guard let data = userDefaults.data(forKey: fridgeItemsKey) else {
+    func loadHistoryItems() -> [HistoryItem] {
+        guard let data = UserDefaults.standard.data(forKey: historyItemsKey) else {
             return []
         }
         
         do {
-            let items = try JSONDecoder().decode([FridgeItem].self, from: data)
-            return items
+            let items = try JSONDecoder().decode([HistoryItem].self, from: data)
+            return items.sorted { $0.timestamp > $1.timestamp } // Most recent first
         } catch {
-            print("Failed to load fridge items: \(error)")
+            print("Failed to load history items: \(error)")
             return []
         }
     }
     
-    static let predefinedCategories = [
-        "Dairy",
-        "Meat",
-        "Vegetables",
-        "Fruits",
-        "Beverages",
-        "Snacks",
-        "Frozen",
-        "Condiments",
-        "Grains",
-        "Other"
-    ]
+    func addHistoryItem(_ item: FridgeItem, action: HistoryAction) {
+        var historyItems = loadHistoryItems()
+        let historyItem = HistoryItem(fridgeItem: item, action: action)
+        historyItems.insert(historyItem, at: 0) // Add to beginning
+        
+        // Keep only last 100 history items to prevent unlimited growth
+        if historyItems.count > 100 {
+            historyItems = Array(historyItems.prefix(100))
+        }
+        
+        saveHistoryItems(historyItems)
+    }
 }
-
