@@ -166,6 +166,9 @@ class FridgeViewController: UIViewController {
         tableView.reloadData()
         updateItemCountLabel()
         
+        // Update notifications after deleting all data
+        NotificationManager.shared.updateNotificationContent()
+        
         let successAlert = UIAlertController(
             title: "Success",
             message: "All data has been deleted.",
@@ -418,6 +421,9 @@ extension FridgeViewController: UITableViewDataSource, UITableViewDelegate {
             tableView.deleteRows(at: [indexPath], with: .fade)
             saveFridgeItems()
             updateItemCountLabel()
+            
+            // Update notifications after removing an item
+            NotificationManager.shared.updateNotificationContent()
         }
     }
 }
@@ -431,6 +437,9 @@ extension FridgeViewController: AddEditItemDelegate {
     
         FridgeDataManager.shared.addHistoryItem(item, action: .added)
         
+        // Update notifications after adding an item
+        NotificationManager.shared.updateNotificationContent()
+        
         applyCurrentFilter()
         updateItemCountLabel()
     }
@@ -441,6 +450,9 @@ extension FridgeViewController: AddEditItemDelegate {
         sortItemsByFavorites()
         saveFridgeItems()
         FridgeDataManager.shared.addHistoryItem(item, action: .updated)
+        
+        // Update notifications after updating an item
+        NotificationManager.shared.updateNotificationContent()
         
         applyCurrentFilter()
         updateItemCountLabel()
